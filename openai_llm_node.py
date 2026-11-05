@@ -65,9 +65,21 @@ class OpenAILLMNode:
             else:
                 image_array = image_tensor
             
-            # Convert from 0-1 float to 0-255 uint8
-            if image_array.max() <= 1.0:
-                image_array = (image_array * 255).astype(np.uint8)
+            # ComfyUI passes torch tensors; convert to a numpy array first
+            if hasattr(image_array, "detach"):
+                image_array = image_array.detach().cpu().float().numpy()
+            else:
+                image_array = np.asarray(image_array)
+            
+            # Convert to 0-255 uint8 (values are 0-1 floats in ComfyUI)
+            if image_array.dtype != np.uint8:
+                if image_array.max() <= 1.0:
+                    image_array = image_array * 255.0
+                image_array = np.clip(image_array, 0, 255).astype(np.uint8)
+            
+            # Drop a trailing single channel so PIL treats it as grayscale
+            if len(image_array.shape) == 3 and image_array.shape[2] == 1:
+                image_array = image_array[:, :, 0]
             
             # Convert numpy array to PIL Image
             if len(image_array.shape) == 3 and image_array.shape[2] == 3:
