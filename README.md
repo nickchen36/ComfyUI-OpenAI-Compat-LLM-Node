@@ -62,7 +62,7 @@ A ComfyUI custom node that provides integration with OpenAI-compatible Large Lan
    - **Prompt**: The user message (supports multi-line input)
    - **Endpoint**: API endpoint URL (default: OpenAI's endpoint)
    - **API Token**: Your API key/token
-   - **Image** (optional): Connect an image from another node for multimodal analysis
+   - **Image** (optional): Connect an image (or a batch; every image is sent) for multimodal analysis
    - **Model**: Model name (default: gpt-4-vision-preview for multimodal support)
    - **Max Tokens**: Maximum response length (default: 150)
    - **Temperature**: Creativity/randomness (0.0-2.0, default: 0.7)
@@ -138,7 +138,7 @@ This node works with any OpenAI-compatible API endpoint, including:
 | max_tokens | INT | No | 150 | Maximum tokens in response |
 | temperature | FLOAT | No | 0.7 | Sampling temperature (0.0-2.0) |
 | image_detail | STRING | No | "auto" | Image processing detail level (low/high/auto) |
-| system_prompt | STRING | No | "You are a helpful assistant." | System message sent before the user prompt; leave empty to send none |
+| system_prompt | STRING | No | "" | System message sent before the user prompt; leave empty to send none |
 
 ## Node Outputs
 
@@ -155,7 +155,7 @@ The node includes comprehensive error handling:
 - Rate limiting and timeout issues
 - Missing response content
 
-Errors are returned as descriptive text strings for debugging.
+Errors are raised, so ComfyUI stops the run and shows the message (including the provider's own error code and text) instead of passing it downstream.
 
 ## Contributing
 
