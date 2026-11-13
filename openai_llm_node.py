@@ -105,7 +105,7 @@ class OpenAILLMNode:
     def generate_text(self, prompt, endpoint, api_token, model="gpt-4-vision-preview", max_tokens=150, temperature=0.7, image=None, image_detail="auto"):
         try:
             headers = {
-                "Authorization": f"Bearer {api_token}",
+                "Authorization": f"Bearer {api_token.strip()}",
                 "Content-Type": "application/json"
             }
             
@@ -142,7 +142,22 @@ class OpenAILLMNode:
             }
             
             response = requests.post(endpoint, headers=headers, json=data, timeout=30)
-            response.raise_for_status()
+            if not response.ok:
+                # Surface the server's own error message; the status line alone
+                # (e.g. "403 Forbidden") doesn't say what is wrong.
+                try:
+                    body = response.json()
+                    err = body.get("error", body) if isinstance(body, dict) else body
+                    if isinstance(err, dict):
+                        detail = err.get("message") or json.dumps(err)
+                        code = err.get("code") or err.get("type")
+                        if code:
+                            detail = f"[{code}] {detail}"
+                    else:
+                        detail = str(err)
+                except ValueError:
+                    detail = response.text[:500] or response.reason
+                return (f"Request Error: HTTP {response.status_code} from {endpoint}: {detail}",)
             
             result = response.json()
             
