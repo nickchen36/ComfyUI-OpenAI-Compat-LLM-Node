@@ -59,7 +59,7 @@ A ComfyUI custom node that provides integration with OpenAI-compatible Large Lan
 2. In the ComfyUI interface, right-click to add a new node
 3. Navigate to `LLM` → `OpenAI Compatible LLM`
 4. Configure the node with your settings:
-   - **Prompt**: Enter your text prompt (supports multi-line input)
+   - **Prompt**: The user message (supports multi-line input)
    - **Endpoint**: API endpoint URL (default: OpenAI's endpoint)
    - **API Token**: Your API key/token
    - **Image** (optional): Connect an image from another node for multimodal analysis
@@ -67,6 +67,7 @@ A ComfyUI custom node that provides integration with OpenAI-compatible Large Lan
    - **Max Tokens**: Maximum response length (default: 150)
    - **Temperature**: Creativity/randomness (0.0-2.0, default: 0.7)
    - **Image Detail**: Quality level for image processing (low/high/auto, default: auto)
+   - **System Prompt**: Instructions sent as the system message (leave empty to send none)
 
 ## Supported Endpoints
 
@@ -129,7 +130,7 @@ This node works with any OpenAI-compatible API endpoint, including:
 
 | Input | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| prompt | STRING | Yes | "You are a helpful assistant." | The text prompt to send to the LLM |
+| prompt | STRING | Yes | "" | The user message sent to the LLM |
 | endpoint | STRING | Yes | "https://api.openai.com/v1/chat/completions" | API endpoint URL |
 | api_token | STRING | Yes | "" | API authentication token |
 | image | IMAGE | No | None | Optional image input for multimodal analysis |
@@ -137,6 +138,7 @@ This node works with any OpenAI-compatible API endpoint, including:
 | max_tokens | INT | No | 150 | Maximum tokens in response |
 | temperature | FLOAT | No | 0.7 | Sampling temperature (0.0-2.0) |
 | image_detail | STRING | No | "auto" | Image processing detail level (low/high/auto) |
+| system_prompt | STRING | No | "You are a helpful assistant." | System message sent before the user prompt; leave empty to send none |
 
 ## Node Outputs
 

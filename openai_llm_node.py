@@ -12,8 +12,8 @@ class OpenAILLMNode:
             "required": {
                 "prompt": ("STRING", {
                     "multiline": True,
-                    "default": "You are a helpful assistant.",
-                    "placeholder": "Enter your prompt here..."
+                    "default": "",
+                    "placeholder": "User prompt..."
                 }),
                 "endpoint": ("STRING", {
                     "multiline": False,
@@ -47,6 +47,12 @@ class OpenAILLMNode:
                 }),
                 "image_detail": (["low", "high", "auto"], {
                     "default": "auto"
+                }),
+                # Added last so existing saved workflows keep their widget order
+                "system_prompt": ("STRING", {
+                    "multiline": True,
+                    "default": "You are a helpful assistant.",
+                    "placeholder": "System prompt (leave empty to send none)"
                 }),
             }
         }
@@ -102,7 +108,7 @@ class OpenAILLMNode:
         except Exception as e:
             raise Exception(f"Failed to encode image: {str(e)}")
     
-    def generate_text(self, prompt, endpoint, api_token, model="gpt-4-vision-preview", max_tokens=150, temperature=0.7, image=None, image_detail="auto"):
+    def generate_text(self, prompt, endpoint, api_token, model="gpt-4-vision-preview", max_tokens=150, temperature=0.7, image=None, image_detail="auto", system_prompt=""):
         try:
             headers = {
                 "Authorization": f"Bearer {api_token.strip()}",
@@ -132,11 +138,14 @@ class OpenAILLMNode:
                 # Text-only message
                 message_content = prompt
             
+            messages = []
+            if system_prompt and system_prompt.strip():
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": message_content})
+            
             data = {
                 "model": model,
-                "messages": [
-                    {"role": "user", "content": message_content}
-                ],
+                "messages": messages,
                 "max_tokens": max_tokens,
                 "temperature": temperature
             }
